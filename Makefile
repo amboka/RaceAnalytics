@@ -22,7 +22,7 @@ help:
 	@echo "  make make_start_back  - Alias for start_back"
 	@echo "  make make_start_online- Alias for start_online"
 	@echo "  make strat_online     - Typo-safe alias for start_online"
-	@echo "  make submodule-update - Init/update git submodules recursively"
+	@echo "  make submodule-update - Legacy no-op (submodules removed)"
 
 start:
 	$(COMPOSE) up -d --build
@@ -67,5 +67,4 @@ make_start_online: start_online
 strat_online: start_online
 
 submodule-update:
-	git submodule sync --recursive
-	git submodule update --init --recursive
+	@echo "No git submodules configured. backend/frontend/online are regular directories."

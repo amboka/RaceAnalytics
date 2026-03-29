@@ -8,25 +8,10 @@ RaceAnalytics is split into three services:
 
 This repository uses a unified Docker setup from the project root.
 
-## Git Submodules
+## Repository Layout
 
-This repository uses git submodules for:
-
-- `backend`
-- `frontend`
-- `online`
-
-Clone with submodules in one command:
-
-```bash
-git clone --recurse-submodules git@github.com:amboka/RaceAnalytics.git
-```
-
-If you cloned without `--recurse-submodules` (or submodule references changed), run:
-
-```bash
-make submodule-update
-```
+`backend`, `frontend`, and `online` are regular directories in this repository.
+No git submodules are required.
 
 ## Prerequisites
 
@@ -185,18 +170,13 @@ make logs
 make ps
 ```
 
-4. `fatal: repository '/.../backend' does not exist` during submodule update
+4. Older clone still has submodule metadata
+
+If your local clone was created before submodules were removed:
 
 ```bash
-git remote -v
-make submodule-update
-```
-
-If `origin` is missing, set it first:
-
-```bash
-git remote add origin git@github.com:amboka/RaceAnalytics.git
-make submodule-update
+git submodule deinit -f --all
+rm -rf .git/modules/backend .git/modules/frontend .git/modules/online
 ```
 
 ## File Overview
