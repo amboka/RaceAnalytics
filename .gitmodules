@@ -1,9 +1,9 @@
 [submodule "backend"]
 	path = backend
-	url = ../backend
+	url = https://github.com/DavitPheikr/hackathon.git
 [submodule "frontend"]
 	path = frontend
-	url = ../frontend
+	url = https://github.com/DavitPheikr/apex-analytics.git
 [submodule "online"]
 	path = online
-	url = ../online
+	url = https://github.com/amboka/hackathon2026.git

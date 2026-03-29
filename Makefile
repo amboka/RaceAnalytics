@@ -67,6 +67,5 @@ make_start_online: start_online
 strat_online: start_online
 
 submodule-update:
-	@git config --get remote.origin.url >/dev/null || (echo "Missing git remote 'origin'. Run: git remote add origin git@github.com:amboka/RaceAnalytics.git" && exit 1)
 	git submodule sync --recursive
 	git submodule update --init --recursive
