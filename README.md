@@ -8,6 +8,8 @@ RaceAnalytics is split into three services:
 
 This repository uses a unified Docker setup from the project root.
 
+The `backend`, `frontend`, and `online` services are included directly in this repository (no git submodules).
+
 ## Prerequisites
 
 - Docker Engine + Docker Compose plugin
@@ -25,19 +27,23 @@ make --version
 
 The backend now uses SQLite only.
 
-1. Put your source SQLite file here:
+1. Download `db.sqlite3` from:
+
+   https://drive.google.com/file/d/1AYbhaBrA9uh3CcNDPCs65Pme8l54U3LP/view?usp=sharing
+
+2. Put the downloaded file in the `data` folder as:
 
 ```text
 data/db.sqlite3
 ```
 
-2. On first backend start, Docker will copy:
+3. On first backend start, Docker will copy:
 
 ```text
 data/db.sqlite3  ->  data/raceanalytics.sqlite3
 ```
 
-3. Django then runs migrations on `data/raceanalytics.sqlite3` and starts the API.
+4. Django then runs migrations on `data/raceanalytics.sqlite3` and starts the API.
 
 Notes:
 

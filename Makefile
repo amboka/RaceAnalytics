@@ -3,7 +3,7 @@ COMPOSE := docker compose -f docker-compose.yml
 
 .PHONY: help start stop restart logs ps attach_front attach_back attach_online \
 	start_front start_back start_online make_start_front make_start_back \
-	make_start_online strat_online
+	make_start_online strat_online submodule-update
 
 help:
 	@echo "RaceAnalytics Docker commands"
@@ -22,6 +22,7 @@ help:
 	@echo "  make make_start_back  - Alias for start_back"
 	@echo "  make make_start_online- Alias for start_online"
 	@echo "  make strat_online     - Typo-safe alias for start_online"
+	@echo "  make submodule-update - Init/update git submodules recursively"
 
 start:
 	$(COMPOSE) up -d --build
@@ -64,3 +65,6 @@ make_start_back: start_back
 make_start_online: start_online
 
 strat_online: start_online
+
+submodule-update:
+	git submodule update --init --recursive
