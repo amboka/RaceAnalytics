@@ -1,9 +1,9 @@
 [submodule "backend"]
 	path = backend
-	url = ./backend
+	url = ../backend
 [submodule "frontend"]
 	path = frontend
-	url = ./frontend
+	url = ../frontend
 [submodule "online"]
 	path = online
-	url = ./online
+	url = ../online

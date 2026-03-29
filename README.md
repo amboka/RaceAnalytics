@@ -16,7 +16,13 @@ This repository uses git submodules for:
 - `frontend`
 - `online`
 
-After cloning (and whenever submodule references change), run:
+Clone with submodules in one command:
+
+```bash
+git clone --recurse-submodules git@github.com:amboka/RaceAnalytics.git
+```
+
+If you cloned without `--recurse-submodules` (or submodule references changed), run:
 
 ```bash
 make submodule-update
@@ -177,6 +183,20 @@ make stop
 ```bash
 make logs
 make ps
+```
+
+4. `fatal: repository '/.../backend' does not exist` during submodule update
+
+```bash
+git remote -v
+make submodule-update
+```
+
+If `origin` is missing, set it first:
+
+```bash
+git remote add origin git@github.com:amboka/RaceAnalytics.git
+make submodule-update
 ```
 
 ## File Overview
