@@ -8,7 +8,19 @@ RaceAnalytics is split into three services:
 
 This repository uses a unified Docker setup from the project root.
 
-The `backend`, `frontend`, and `online` services are included directly in this repository (no git submodules).
+## Git Submodules
+
+This repository uses git submodules for:
+
+- `backend`
+- `frontend`
+- `online`
+
+After cloning (and whenever submodule references change), run:
+
+```bash
+make submodule-update
+```
 
 ## Prerequisites
 
