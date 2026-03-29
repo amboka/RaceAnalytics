@@ -1,0 +1,69 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: backend
+    container_name: raceanalytics_backend
+    working_dir: /workspace/backend
+    command: >-
+      /bin/bash -lc
+      "mkdir -p /workspace/data
+      && if [ ! -f \"$$SQLITE_DB_PATH\" ] && [ -f \"$$SQLITE_SEED_FILE\" ]; then cp \"$$SQLITE_SEED_FILE\" \"$$SQLITE_DB_PATH\"; fi
+      && source /opt/ros/humble/setup.bash
+      && python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_DB_ENGINE: django.db.backends.sqlite3
+      DJANGO_DB_NAME: /workspace/data/raceanalytics.sqlite3
+      SQLITE_DB_PATH: /workspace/data/raceanalytics.sqlite3
+      SQLITE_SEED_FILE: /workspace/data/db.sqlite3
+      NVIDIA_VISIBLE_DEVICES: all
+      NVIDIA_DRIVER_CAPABILITIES: all
+    volumes:
+      - ./backend:/workspace/backend
+      - ./data:/workspace/data
+    ports:
+      - "8000:8000"
+      - "8888:8888"
+    stdin_open: true
+    tty: true
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: frontend
+    container_name: raceanalytics_frontend
+    working_dir: /workspace/frontend
+    command: ["npm", "run", "dev", "--", "--host", "0.0.0.0", "--port", "8080"]
+    volumes:
+      - ./frontend:/workspace/frontend
+      - frontend_node_modules:/workspace/frontend/node_modules
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true
+
+  online:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: online
+    container_name: raceanalytics_online
+    working_dir: /workspace/online/files
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CODRIVER_SKIP_PROMPT: "1"
+      CODRIVER_TTS_BACKEND: espeak
+      MPLBACKEND: Agg
+    volumes:
+      - ./online/files:/workspace/online/files
+    command: ["python", "main.py", "--synthetic", "--no-claude", "--speed", "3.0"]
+    stdin_open: true
+    tty: true
+
+volumes:
+  frontend_node_modules:
