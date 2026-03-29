@@ -1,0 +1,50 @@
+services:
+  ros2_cuda:
+    build: ./
+    container_name: hachathon_1
+
+    working_dir: /workspace
+
+    volumes:
+      - ./:/workspace
+
+    ports:
+      - "8888:8888"
+      - "8000:8000"
+
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=all
+      - DJANGO_DB_ENGINE=${DJANGO_DB_ENGINE:-django.db.backends.sqlite3}
+      - DJANGO_DB_NAME=${DJANGO_DB_NAME:-/workspace/db.sqlite3}
+      - DJANGO_DB_USER=${DJANGO_DB_USER:-postgres}
+      - DJANGO_DB_PASSWORD=${DJANGO_DB_PASSWORD:-postgres}
+      - DJANGO_DB_HOST=${DJANGO_DB_HOST:-db}
+      - DJANGO_DB_PORT=${DJANGO_DB_PORT:-5432}
+
+    depends_on:
+      - db
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  db:
+    image: postgres:16
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB:-appdb}
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

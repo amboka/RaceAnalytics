@@ -1,0 +1,20 @@
+services:
+  codriver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    working_dir: /app/files
+    environment:
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      CODRIVER_SKIP_PROMPT: "1"
+      CODRIVER_TTS_BACKEND: espeak
+      MPLBACKEND: Agg
+      PULSE_COOKIE: /tmp/pulse-cookie
+      PULSE_SERVER: unix:/tmp/pulse-socket
+    volumes:
+      - ./files:/app/files
+      - ${HOME}/.config/pulse/cookie:/tmp/pulse-cookie:ro
+      - ${XDG_RUNTIME_DIR:-/run/user/1000}/pulse/native:/tmp/pulse-socket
+    stdin_open: true
+    tty: true
+    command: ["python", "main.py", "--synthetic", "--no-claude", "--speed", "3.0"]

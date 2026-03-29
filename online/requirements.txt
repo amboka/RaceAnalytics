@@ -1,0 +1,9 @@
+anthropic
+matplotlib
+mcap
+mcap-ros2-support
+numpy
+opencv-python-headless
+pandas
+pyttsx3
+rich

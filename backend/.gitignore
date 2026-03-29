@@ -1,0 +1,7 @@
+build/
+install/
+log/
+*.mcap
+appdb
+__pycache__/
+*.pyc
