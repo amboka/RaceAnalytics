@@ -1,6 +1,6 @@
 # 🏁 RaceAnalytics
 
-🏆 **Winner — Constructor GenAI Hackathon 2026 (Autonomous Racing Track)**  
+🏆 **Winner — BMW x Constructor Knowledge Labs  GenAI Hackathon 2026 (Autonomous Racing Track)**  
 Our team built RaceAnalytics during a 4-day hackathon and won the **Constructor Knowledge Labs track** focused on autonomous racing and decision systems.
 
 ---
