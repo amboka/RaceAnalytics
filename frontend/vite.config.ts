@@ -11,14 +11,6 @@ export default defineConfig(({ mode }) => ({
     hmr: {
       overlay: false,
     },
-    proxy: {
-      "/hf-router": {
-        target: "https://router.huggingface.co",
-        changeOrigin: true,
-        secure: true,
-        rewrite: (path) => path.replace(/^\/hf-router/, ""),
-      },
-    },
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { X, Send, Sparkles, Bot, User, Loader2 } from "lucide-react";
+import { X, Send, Sparkles, Bot, User } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { streamGeminiChat, type GeminiMessage } from "@/lib/gemini";
 
 interface Message {
   id: string;
@@ -9,132 +8,8 @@ interface Message {
   content: string;
 }
 
-const SYSTEM_PROMPT = `You are an AI Racing Coach embedded inside a professional racing analytics platform.
-
-Your purpose is to help drivers improve lap performance using telemetry data from the Yas Marina Circuit (Abu Dhabi). You analyze driving behavior by comparing the user's current lap against an optimal reference lap.
-
-You must always stay within the racing domain. Do NOT answer unrelated questions.
-
-----------------------------------------
-CONTEXT
-----------------------------------------
-
-The platform provides:
-- Lap time comparison (current vs best lap)
-- Sector-based performance breakdown (Sector 1, 2, 3)
-- Telemetry data including:
-  - Throttle input
-  - Brake pressure
-  - RPM
-  - Gear shifts
-  - Steering angle
-  - Tire slip and grip
-- Time lost analysis (cornering, long sections, technical sections)
-- AI-generated insights about mistakes and improvements
-
-Users are trying to:
-- Reduce lap time
-- Improve racing line
-- Optimize braking and throttle usage
-- Improve car control (steering, grip, slip)
-
-----------------------------------------
-HOW YOU SHOULD RESPOND
-----------------------------------------
-
-Always respond like a professional race engineer.
-
-Your answers MUST follow this structure:
-
-1. Insight
-   → What is happening
-
-2. Cause
-   → Why it is happening (based on driving behavior)
-
-3. Recommendation
-   → What the driver should do differently
-
-----------------------------------------
-BEHAVIOR RULES
-----------------------------------------
-
-- Be concise and clear
-- Use racing terminology (apex, braking zone, traction, entry/exit, etc.)
-- Base answers ONLY on telemetry logic (do not guess randomly)
-- If data is missing, say so explicitly
-- Focus on performance improvement, not explanation alone
-- Prioritize actionable advice over theory
-- Use markdown formatting for clarity
-
-----------------------------------------
-IMPORTANT
-----------------------------------------
-
-You are NOT a general chatbot.
-You are a racing performance coach.
-Stay focused on: Lap performance, Telemetry analysis, Driving improvement.
-Ignore or refuse anything outside this scope.
-
-----------------------------------------
-TELEMETRY DATA CONTEXT (JSON)
-----------------------------------------
-
-Below is the current session data you have access to. Use it to ground your answers:
-
-{
-  "project": {
-    "name": "RaceAnalytics AI Coach",
-    "event": "Constructor GenAI Hackathon 2026",
-    "track": "Yas Marina Circuit, Abu Dhabi, UAE",
-    "goal": "Provide AI-driven coaching based on telemetry comparison between current lap and optimal/best lap.",
-    "data_sources": ["GPS", "IMU", "CAN bus", "Throttle", "Brake", "Steering", "RPM", "Gearbox", "Tyre", "Suspension"]
-  },
-  "lap_comparison": {
-    "current_lap": {
-      "lap_time": 72.044,
-      "max_speed": 246.2,
-      "braking_efficiency": 88.9,
-      "grip_score": 84.4
-    },
-    "best_lap": {
-      "lap_time": 65.0
-    },
-    "delta": {
-      "lap_time_diff": 7.084
-    }
-  },
-  "sectors": [
-    { "id": "S1", "time": 14.83, "loss": 1.96, "issues": ["late braking"] },
-    { "id": "S2", "time": 31.56, "loss": 3.68, "issues": ["early throttle", "traction loss"] },
-    { "id": "S3", "time": 25.65, "loss": 1.43, "issues": ["line inefficiency"] }
-  ],
-  "telemetry_concepts": {
-    "throttle": "Throttle percentage over time",
-    "braking": "Brake pressure and timing",
-    "rpm": "Engine revolutions per minute",
-    "gear": "Selected gear over time",
-    "steering": "Steering angle input",
-    "slip": "Tire slip indicating grip loss"
-  },
-  "time_loss_breakdown": {
-    "snake": 3.684,
-    "long": 1.438,
-    "corner": 1.962
-  },
-  "ai_examples": [
-    { "type": "corner", "message": "Turn 3: You are braking too late. Brake earlier for better entry.", "severity": "high" },
-    { "type": "throttle", "message": "Sector 2: You apply throttle too early, causing traction loss.", "severity": "medium" },
-    { "type": "overall", "message": "Your consistency improved. Focus on apex accuracy for gains.", "severity": "low" }
-  ],
-  "example_questions": [
-    "Why am I losing time in sector 2?",
-    "How can I brake better?",
-    "Where is my biggest mistake?",
-    "Am I oversteering?",
-    "How do I improve corner exits?"
-  ]
-}`;
+const DEMO_DISABLED_MESSAGE =
+  "Copilot is disabled for demo purposes in this deployment.";
 
 const INITIAL_MESSAGES: Message[] = [
   {
@@ -154,10 +29,8 @@ const CopilotChat = ({
 }) => {
   const [messages, setMessages] = useState<Message[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState("");
-  const [isStreaming, setIsStreaming] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const abortRef = useRef<AbortController | null>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const dragState = useRef<{
     startX: number;
@@ -173,11 +46,6 @@ const CopilotChat = ({
   useEffect(() => {
     if (open) setPosition({ x: 0, y: 0 });
   }, [open]);
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return () => abortRef.current?.abort();
-  }, []);
 
   const onPointerDown = useCallback(
     (e: React.PointerEvent) => {
@@ -221,94 +89,22 @@ const CopilotChat = ({
     dragState.current = null;
   }, []);
 
-  const buildGeminiHistory = (msgs: Message[]): GeminiMessage[] => {
-    return msgs
-      .filter((m) => m.id !== "welcome")
-      .map((m) => ({
-        role: m.role === "user" ? ("user" as const) : ("model" as const),
-        parts: [{ text: m.content }],
-      }));
-  };
-
   const handleSend = async () => {
-    if (!input.trim() || isStreaming) return;
+    if (!input.trim()) return;
 
     const userMsg: Message = {
       id: Date.now().toString(),
       role: "user",
       content: input.trim(),
     };
-    const userText = input.trim();
-    setMessages((prev) => [...prev, userMsg]);
+    const assistantMsg: Message = {
+      id: (Date.now() + 1).toString(),
+      role: "assistant",
+      content: DEMO_DISABLED_MESSAGE,
+    };
+
+    setMessages((prev) => [...prev, userMsg, assistantMsg]);
     setInput("");
-    setIsStreaming(true);
-
-    const assistantId = (Date.now() + 1).toString();
-    let assistantContent = "";
-
-    // Add empty assistant message
-    setMessages((prev) => [
-      ...prev,
-      { id: assistantId, role: "assistant", content: "" },
-    ]);
-
-    const controller = new AbortController();
-    abortRef.current = controller;
-
-    await streamGeminiChat({
-      history: buildGeminiHistory([...messages, userMsg]),
-      userMessage: userText,
-      systemInstruction: SYSTEM_PROMPT,
-      signal: controller.signal,
-      onDelta: (text) => {
-        assistantContent += text;
-        const snapshot = assistantContent;
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content: snapshot } : m,
-          ),
-        );
-      },
-      onDone: () => {
-        setIsStreaming(false);
-        abortRef.current = null;
-      },
-      onError: (err) => {
-        console.error("LLM error:", err);
-        const raw = err?.message ?? "";
-
-        const isApiKeyError =
-          raw.includes("VITE_HF_API_TOKEN") ||
-          raw.includes("VITE_GEMINI_API_KEY");
-        const isQuotaError =
-          /429|RESOURCE_EXHAUSTED|quota exceeded|rate limit|too many requests/i.test(
-            raw,
-          );
-        const isPermissionError =
-          /403|sufficient permissions|Inference Providers/i.test(raw);
-
-        const errorText = isApiKeyError
-          ? "⚠️ API token not configured. Add `VITE_HF_API_TOKEN` to your environment."
-          : isQuotaError
-            ? "⚠️ Request limit exceeded. Check your Hugging Face token limits and retry shortly."
-            : isPermissionError
-              ? "⚠️ Token permission issue. Create a fine-grained HF token with `Make calls to Inference Providers` and update `VITE_HF_API_TOKEN`."
-              : `⚠️ Error: ${raw}`;
-
-        setMessages((prev) =>
-          prev.map((m) =>
-            m.id === assistantId ? { ...m, content: errorText } : m,
-          ),
-        );
-        setIsStreaming(false);
-        abortRef.current = null;
-      },
-    });
-  };
-
-  const handleStop = () => {
-    abortRef.current?.abort();
-    setIsStreaming(false);
   };
 
   if (!open) return null;
@@ -384,12 +180,6 @@ const CopilotChat = ({
             </div>
           </div>
         ))}
-        {isStreaming && (
-          <div className="flex items-center gap-2 text-muted-foreground text-xs px-1">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            <span>Thinking…</span>
-          </div>
-        )}
         <div ref={bottomRef} />
       </div>
 
@@ -407,25 +197,14 @@ const CopilotChat = ({
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your telemetry…"
             className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none py-1.5"
-            disabled={isStreaming}
           />
-          {isStreaming ? (
-            <button
-              type="button"
-              onClick={handleStop}
-              className="w-7 h-7 rounded-lg flex items-center justify-center bg-destructive text-destructive-foreground hover:bg-destructive/90 transition-colors"
-            >
-              <X className="w-3.5 h-3.5" />
-            </button>
-          ) : (
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary text-primary-foreground disabled:opacity-30 hover:bg-primary/90 transition-colors"
-            >
-              <Send className="w-3.5 h-3.5" />
-            </button>
-          )}
+          <button
+            type="submit"
+            disabled={!input.trim()}
+            className="w-7 h-7 rounded-lg flex items-center justify-center bg-primary text-primary-foreground disabled:opacity-30 hover:bg-primary/90 transition-colors"
+          >
+            <Send className="w-3.5 h-3.5" />
+          </button>
         </form>
       </div>
     </div>
