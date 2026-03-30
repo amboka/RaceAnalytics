@@ -42,7 +42,9 @@ RaceAnalytics provides two core modes:
 
 While the car is on track, RaceAnalytics processes telemetry and provides real-time guidance and insights.
 
-▶️ **Watch Live Demo**
+▶️ **Watch Live Demo (open the link or click on the image bellow)**
+
+[▶️ Watch Live Demo](https://drive.google.com/file/d/1fP572eWUULeeYXmj3h4gll9UL1ikHFAW/view?usp=drive_link)
 
 [![Live Mode](./assets/live.png)](https://drive.google.com/file/d/1fP572eWUULeeYXmj3h4gll9UL1ikHFAW/view?usp=drive_link)
 
