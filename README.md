@@ -1,4 +1,95 @@
-# RaceAnalytics
+# 🏁 RaceAnalytics
+
+🏆 **Winner — Constructor GenAI Hackathon 2026 (Autonomous Racing Track)**  
+Our team built RaceAnalytics during a 4-day hackathon and won the **Constructor Knowledge Labs track** focused on autonomous racing and decision systems.
+
+---
+
+## 🧠 Problem Statement
+
+Motorsport is one of the most data-intensive sports, yet most drivers receive little to no structured coaching.
+
+Drivers:
+
+- Record laps, but get no actionable feedback
+- Work with fragmented data (telemetry, video, notes across tools)
+- Cannot afford professional coaching at scale
+- Lack a clear way to track progress and improvement
+
+At the same time, the available data is extremely rich:
+
+- High-frequency telemetry (speed, throttle, brake, steering, G-forces)
+- Multi-sensor inputs (cameras, LiDAR, GNSS, IMU)
+- Per-wheel and track boundary data
+
+👉 **Challenge:**  
+Build an intelligent system that transforms raw racing data into actionable insights, feedback, and real-time guidance — effectively acting as a _personal race engineer_.
+
+---
+
+## 🎥 Demo
+
+RaceAnalytics provides two core modes:
+
+- **Live Mode** — real-time feedback while the car is driving
+- **Offline Mode** — post-lap analysis and insights dashboard
+
+> ⚠️ Note: The AI co-driver (copilot API) is disabled in this demo version.
+
+---
+
+### 🟢 Live Mode (Real-Time)
+
+While the car is on track, RaceAnalytics processes telemetry and provides real-time guidance and insights.
+
+[▶️ Watch Live Demo](./assets/live%20video.mp4)
+
+---
+
+### 🔵 Offline Mode (Post-Lap Analysis)
+
+After the session, drivers can analyze performance in detail through the dashboard.
+
+#### 🏠 Home Dashboard
+![Home](./assets/home.png)
+
+---
+
+#### 🗺️ Track Sections Analysis
+![Map Section](./assets/map-section.png)
+![Map Section 2](./assets/map-section-2.png)
+![Map Section 3](./assets/map-section-3.png)
+
+---
+
+#### ⚙️ Car Performance Insights
+
+**Engine**
+![Engine](./assets/engine.png)
+
+**Brakes**
+![Brakes](./assets/breaks.png)
+
+**Steering**
+![Steering](./assets/steering.png)
+
+---
+
+#### 📊 Lap History & Progress
+
+**History Overview**
+![History](./assets/history.png)
+
+**Detailed History**
+![Detailed History](./assets/detailed-history.png)
+
+**Mistake Detection**
+![Mistakes](./assets/history-mistakes-page.png)
+![Mistakes 2](./assets/history-mistakes-page-2.png)
+
+---
+
+## Setup
 
 RaceAnalytics is split into three services:
 
